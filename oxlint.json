@@ -1,0 +1,55 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "env": {
+    "node": true
+  },
+  "ignorePatterns": ["dist/**", "coverage/**", "node_modules/**", "*.d.ts"],
+  "globals": {
+    "console": "readonly"
+  },
+  "rules": {
+    "eqeqeq": "error",
+    "curly": "error",
+
+    "no-console": "off",
+    "no-debugger": "error",
+    "no-alert": "error",
+
+    "unicorn/no-useless-spread": "off",
+
+    "no-var": "error",
+    "prefer-const": "error",
+
+    "no-duplicate-imports": "error",
+    "no-self-compare": "error",
+    "no-unreachable": "error",
+    "no-unreachable-loop": "error",
+    "no-unused-labels": "error",
+    "no-useless-catch": "error",
+    "no-useless-concat": "error",
+    "no-useless-constructor": "error",
+    "no-useless-return": "error",
+
+    "default-case-last": "error",
+
+    "constructor-super": "error",
+    "getter-return": "error",
+    "no-const-assign": "error",
+    "no-dupe-args": "error",
+    "no-dupe-class-members": "error",
+    "no-dupe-else-if": "error",
+    "no-dupe-keys": "error",
+    "no-empty-pattern": "error",
+    "no-func-assign": "error",
+    "no-import-assign": "error",
+    "no-irregular-whitespace": "error",
+    "no-new-symbol": "error",
+    "no-obj-calls": "error",
+    "no-setter-return": "error",
+    "no-sparse-arrays": "error",
+    "no-this-before-super": "error",
+    "no-unsafe-finally": "error",
+    "use-isnan": "error",
+    "valid-typeof": "error"
+  }
+}

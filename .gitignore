@@ -1,0 +1,16 @@
+node_modules/
+
+# Output
+dist
+*.tgz
+
+# Editor
+.DS_Store
+.idea/
+*.swp
+
+# Typescript
+*.tsbuildinfo
+
+# AI
+graphify-out

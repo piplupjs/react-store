@@ -1,0 +1,77 @@
+{
+  "name": "@piplup/react-store",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Context-scoped React state management that lives in your component tree instead of as a global singleton. Uses useSyncExternalStore internally but gives you Provider-bound, selector-driven stores with stable actions — no external subscriptions, no hydration mismatches.",
+  "keywords": [
+    "context",
+    "piplup",
+    "piplupjs",
+    "react",
+    "selector",
+    "state",
+    "store",
+    "typescript",
+    "useSyncExternalStore"
+  ],
+  "bugs": {
+    "url": "https://github.com/piplupjs/react-store/issues"
+  },
+  "license": "Apache-2.0",
+  "author": "PiplupJS",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/piplupjs/react-store.git"
+  },
+  "files": [
+    "dist"
+  ],
+  "type": "module",
+  "sideEffects": false,
+  "main": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "cleanup": "node ./scripts/cleanup.mjs",
+    "format": "oxfmt . --check",
+    "format:fix": "oxfmt .",
+    "lint": "oxlint .",
+    "lint:fix": "oxlint . --fix",
+    "build": "node ./scripts/build.mjs",
+    "typecheck": "tsc",
+    "release": "node ./scripts/release.mjs",
+    "release:dry": "node ./scripts/release.mjs --dry-run",
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^21.2.0",
+    "@commitlint/config-conventional": "^21.2.0",
+    "@testing-library/dom": "^10.4.0",
+    "@testing-library/react": "^16.3.0",
+    "@types/node": "^26.1.1",
+    "@types/react": "^18.3.0",
+    "@types/react-dom": "^18.3.0",
+    "cli-table3": "^0.6.5",
+    "esbuild": "^0.28.1",
+    "fast-glob": "^3.3.3",
+    "filesize": "^11.0.19",
+    "gzip-size": "^7.0.0",
+    "jsdom": "^26.1.0",
+    "lefthook": "^2.1.9",
+    "oxfmt": "^0.57.0",
+    "oxlint": "^1.72.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "rimraf": "^6.1.3",
+    "typescript": "^7.0.2",
+    "vitest": "^4.1.10"
+  },
+  "peerDependencies": {
+    "react": ">=18"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "packageManager": "pnpm@11.20.0"
+}
