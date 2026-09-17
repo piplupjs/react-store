@@ -1,6 +1,6 @@
 {
   "name": "@piplup/react-store",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "private": true,
   "description": "Context-scoped React state management that lives in your component tree instead of as a global singleton. Uses useSyncExternalStore internally but gives you Provider-bound, selector-driven stores with stable actions — no external subscriptions, no hydration mismatches.",
   "keywords": [
