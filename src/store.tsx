@@ -1,9 +1,8 @@
-import type { ReactNode } from 'react';
-import { createContext, useContext, useMemo, useState, useSyncExternalStore } from 'react';
+import * as React from 'react';
 
-//#region Types
+// #region Types
 
-export type SetStore<TState> = (update: TState | ((prev: Readonly<TState>) => TState)) => void;
+export type SetStore<TState> = (update: ((prev: Readonly<TState>) => TState) | TState) => void;
 
 type Listener = () => void;
 
@@ -33,23 +32,23 @@ interface Store<TState extends object> {
 }
 
 interface ProviderProps<TState extends object> {
-  children: ReactNode;
+  children: React.ReactNode;
   initialState: Readonly<TState>;
 }
 
 interface SelectorSubscription<TResult> {
   /**
-   * Returns the last computed selector result.
-   *
-   * This value is cached so that useSyncExternalStore always
-   * receives a stable snapshot between store changes.
-   */
-  getSnapshot(): TResult;
-
-  /**
    * Returns the initial selector result used during SSR.
    */
   getServerSnapshot(): TResult;
+
+  /**
+   * Returns the last computed selector result.
+   *
+   * This value is cached so that React.useSyncExternalStore always
+   * receives a stable snapshot between store changes.
+   */
+  getSnapshot(): TResult;
 
   /**
    * Subscribes to changes in the selected value.
@@ -57,9 +56,9 @@ interface SelectorSubscription<TResult> {
   subscribe(listener: Listener): () => void;
 }
 
-//#endregion
+// #endregion
 
-//#region Store
+// #region Store
 
 function createStore<TState extends object>(initialState: Readonly<TState>): Store<TState> {
   let state = initialState;
@@ -112,9 +111,9 @@ function createStore<TState extends object>(initialState: Readonly<TState>): Sto
   };
 }
 
-//#endregion
+// #endregion
 
-//#region Selector Subscription
+// #region Selector Subscription
 
 /**
  * Creates a React-compatible subscription for a selector.
@@ -131,7 +130,7 @@ function createSelectorSubscription<TState extends object, TResult>(
   let selected = selector(state);
 
   /*
-   * useSyncExternalStore requires getSnapshot() to return a cached
+   * React.useSyncExternalStore requires getSnapshot() to return a cached
    * value. The selector must therefore not run from getSnapshot().
    */
   const getSnapshot = (): TResult => selected;
@@ -180,15 +179,15 @@ function createSelectorSubscription<TState extends object, TResult>(
   };
 
   return {
-    getSnapshot,
     getServerSnapshot,
+    getSnapshot,
     subscribe,
   };
 }
 
-//#endregion
+// #endregion
 
-//#region Store Definition
+// #region Store Definition
 
 function defaultSelector<TState extends object>(state: Readonly<TState>): Readonly<TState> {
   return state;
@@ -198,9 +197,9 @@ export function defineStore<TState extends object>(name: string) {
   return function defineStoreWithActions<TActions extends object>(
     createActions: (set: SetStore<TState>) => TActions,
   ) {
-    const StoreContext = createContext<Store<TState> | null>(null);
+    const StoreContext = React.createContext<null | Store<TState>>(null);
 
-    const ActionsContext = createContext<TActions | null>(null);
+    const ActionsContext = React.createContext<null | TActions>(null);
 
     if (process.env.NODE_ENV !== 'production') {
       StoreContext.displayName = `${name}.StoreContext`;
@@ -214,13 +213,13 @@ export function defineStore<TState extends object>(name: string) {
        * initialState is therefore an initializer, not a value that
        * synchronizes the store after the Provider has mounted.
        */
-      const [store] = useState(() => createStore(initialState));
+      const [store] = React.useState(() => createStore(initialState));
 
       /*
        * Actions are created once and retain the same identity for
        * the lifetime of this Provider.
        */
-      const [actions] = useState(() => createActions(store.setState));
+      const [actions] = React.useState(() => createActions(store.setState));
 
       return (
         <StoreContext.Provider value={store}>
@@ -234,7 +233,7 @@ export function defineStore<TState extends object>(name: string) {
     }
 
     function useStoreContext(): Store<TState> {
-      const store = useContext(StoreContext);
+      const store = React.useContext(StoreContext);
 
       if (store === null) {
         throw new Error(`${name}: useStore must be used within <${name}.Provider>.`);
@@ -257,16 +256,16 @@ export function defineStore<TState extends object>(name: string) {
      */
     function useStore(): Readonly<TState>;
     function useStore<TResult>(selector: Selector<TState, TResult>): TResult;
-    function useStore<TResult>(selector?: Selector<TState, TResult>): TResult | Readonly<TState> {
+    function useStore<TResult>(selector?: Selector<TState, TResult>): Readonly<TState> | TResult {
       const store = useStoreContext();
-      const resolvedSelector: Selector<TState, TResult | Readonly<TState>> =
+      const resolvedSelector: Selector<TState, Readonly<TState> | TResult> =
         selector ?? defaultSelector;
-      const subscription = useMemo(
+      const subscription = React.useMemo(
         () => createSelectorSubscription(store, resolvedSelector),
         [store, resolvedSelector],
       );
 
-      return useSyncExternalStore(
+      return React.useSyncExternalStore(
         subscription.subscribe,
         subscription.getSnapshot,
         subscription.getServerSnapshot,
@@ -280,7 +279,7 @@ export function defineStore<TState extends object>(name: string) {
      * referentially stable.
      */
     function useActions(): Readonly<TActions> {
-      const actions = useContext(ActionsContext);
+      const actions = React.useContext(ActionsContext);
 
       if (actions === null) {
         throw new Error(`${name}: useActions must be used within <${name}.Provider>.`);
@@ -297,4 +296,4 @@ export function defineStore<TState extends object>(name: string) {
   };
 }
 
-//#endregion
+// #endregion

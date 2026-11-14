@@ -21,49 +21,9 @@ import { getWorkspaceRoot, spawn, exec, readJson, writeJson } from './utils.mjs'
 const workspaceRoot = getWorkspaceRoot();
 
 const config = {
-  workspaceRoot,
   distDirectory: join(workspaceRoot, 'dist'),
   distPackageJson: join(workspaceRoot, 'dist', 'package.json'),
-};
-
-const parseArgs = (argv) => {
-  const options = {
-    bump: /** @type {'patch' | 'minor' | 'major'} */ ('patch'),
-    dryRun: false,
-    ci: false,
-    message: /** @type {string | null} */ (null),
-    remote: 'origin',
-  };
-
-  for (let index = 0; index < argv.length; index++) {
-    const arg = argv[index];
-
-    switch (arg) {
-      case '--dry-run':
-        options.dryRun = true;
-        break;
-      case '--ci':
-        options.ci = true;
-        break;
-      case '--message':
-        options.message = argv[++index] ?? null;
-        break;
-      case '--remote':
-        options.remote = argv[++index] ?? 'origin';
-        break;
-      case '--help':
-        printHelp();
-        process.exit(0);
-      default:
-        if (arg.startsWith('--')) {
-          throw new Error(`Unknown flag: ${arg}`);
-        }
-
-        options.bump = /** @type {'patch' | 'minor' | 'major'} */ (arg);
-    }
-  }
-
-  return options;
+  workspaceRoot,
 };
 
 const printHelp = () => {
@@ -80,8 +40,53 @@ Flags:
 `);
 };
 
+const parseArgs = (argv) => {
+  const options = {
+    bump: /** @type {'patch' | 'minor' | 'major'} */ ('patch'),
+    ci: false,
+    dryRun: false,
+    message: /** @type {string | null} */ (null),
+    remote: 'origin',
+  };
+
+  for (let index = 0; index < argv.length; index += 1) {
+    const arg = argv[index];
+
+    switch (arg) {
+      case '--dry-run':
+        options.dryRun = true;
+        break;
+      case '--ci':
+        options.ci = true;
+        break;
+      case '--message':
+        index += 1;
+        options.message = argv[index] ?? null;
+        break;
+      case '--remote':
+        index += 1;
+        options.remote = argv[index] ?? 'origin';
+        break;
+      case '--help':
+        printHelp();
+        process.exit(0);
+        break;
+      default:
+        if (arg.startsWith('--')) {
+          throw new Error(`Unknown flag: ${arg}`);
+        }
+
+        options.bump = /** @type {'patch' | 'minor' | 'major'} */ (arg);
+    }
+  }
+
+  return options;
+};
+
 const assertCleanGitTree = (dryRun) => {
-  if (dryRun) return;
+  if (dryRun) {
+    return;
+  }
 
   const { stdout } = exec('git', ['status', '--porcelain'], { silent: true });
 
@@ -112,12 +117,12 @@ const bumpVersion = async (type, dryRun) => {
 
   const [major, minor, patch] = parts;
 
-  const next =
-    type === 'major'
-      ? `${major + 1}.0.0`
-      : type === 'minor'
-        ? `${major}.${minor + 1}.0`
-        : `${major}.${minor}.${patch + 1}`;
+  let next = `${major}.${minor}.${patch + 1}`;
+  if (type === 'major') {
+    next = `${major + 1}.0.0`;
+  } else if (type === 'minor') {
+    next = `${major}.${minor + 1}.0`;
+  }
 
   if (dryRun) {
     console.log(`[dry-run] version ${pkg.version} -> ${next}`);
