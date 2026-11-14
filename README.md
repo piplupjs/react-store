@@ -4,17 +4,17 @@ SSR-safe, Context-scoped React state management that lives in your component tre
 
 ## Features
 
-* **Provider-scoped** — each `<Provider>` creates an isolated store instance.
-* **Selectors** — subscribe to specific state slices with `Object.is` comparison.
-* **Stable actions** — actions retain the same identity for the lifetime of the provider.
-* **SSR-safe** — store instances live inside the React tree.
-* **Composable** — nest multiple providers with `compose`.
-* **Zero runtime dependencies** — React only.
+- **Provider-scoped** — each `<Provider>` creates an isolated store instance.
+- **Selectors** — subscribe to specific state slices with `Object.is` comparison.
+- **Stable actions** — actions retain the same identity for the lifetime of the provider.
+- **SSR-safe** — store instances live inside the React tree.
+- **Composable** — nest multiple providers with `compose`.
+- **Zero runtime dependencies** — React only.
 
 ## Requirements
 
-* Node.js `>= 18`
-* React `>= 18`
+- Node.js `>= 18`
+- React `>= 18`
 
 ## Installation
 
@@ -97,15 +97,15 @@ The last provider passed to `compose` wraps the component directly.
 Creates a provider-scoped store definition.
 
 ```ts
-defineStore<TState>(name)((set) => TActions)
+defineStore<TState>(name)((set) => TActions);
 ```
 
 Returns:
 
-* **`Provider`** — creates an isolated store instance.
-* **`useStore()`** — returns the complete state.
-* **`useStore(selector)`** — subscribes to a selected state value.
-* **`useActions()`** — returns the stable actions object.
+- **`Provider`** — creates an isolated store instance.
+- **`useStore()`** — returns the complete state.
+- **`useStore(selector)`** — subscribes to a selected state value.
+- **`useActions()`** — returns the stable actions object.
 
 `Provider` accepts `initialState` as the store's initial value. It is not a syncing prop.
 

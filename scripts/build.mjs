@@ -26,12 +26,12 @@ const config = {
   get distPackageJson() {
     return join(this.distDirectory, 'package.json');
   },
-  distEntryFileName: 'index'
+  distEntryFileName: 'index',
 };
 
 const runCleanup = async () => {
   return exec('pnpm', ['cleanup'], {
-    cwd: config.workspaceRoot
+    cwd: config.workspaceRoot,
   });
 };
 
@@ -39,7 +39,7 @@ const getBuildStats = async () => {
   const files = await fg(['**/*.js', '**/*.d.ts', '**/*.json', 'LICENSE', 'README.md'], {
     cwd: config.distDirectory,
     absolute: true,
-    onlyFiles: true
+    onlyFiles: true,
   });
 
   let total = 0;
@@ -58,21 +58,21 @@ const getBuildStats = async () => {
       return {
         file: relative(config.distDirectory, file),
         size: filesize(size),
-        gzip: filesize(gzip)
+        gzip: filesize(gzip),
       };
-    })
+    }),
   );
 
   return {
     files: stats.sort((a, b) => a.file.localeCompare(b.file)),
     total,
-    gzipTotal
+    gzipTotal,
   };
 };
 
 const createStatsTable = (stats) => {
   const table = new Table({
-    head: ['File', 'Size', 'Gzip']
+    head: ['File', 'Size', 'Gzip'],
   });
 
   for (const item of stats.files) {
@@ -88,7 +88,7 @@ const build = async () => {
   const entryPoints = await fg(['src/**/*.{ts,tsx}'], {
     cwd: config.workspaceRoot,
     ignore: ['**/*.test.ts', '**/*.test.tsx'],
-    absolute: true
+    absolute: true,
   });
 
   await esbuild.build({
@@ -100,13 +100,13 @@ const build = async () => {
     target: 'es2020',
     packages: 'external',
     define: {
-      'process.env.NODE_ENV': '"production"'
+      'process.env.NODE_ENV': '"production"',
     },
-    minifySyntax: true
+    minifySyntax: true,
   });
 
   exec('tsc', ['-p', 'tsconfig.build.json'], {
-    cwd: config.workspaceRoot
+    cwd: config.workspaceRoot,
   });
 
   const workspacePackageJson = JSON.parse(await fs.readFile(config.workspacePackageJson, 'utf8'));
@@ -118,8 +118,8 @@ const build = async () => {
   distPackage.exports = {
     '.': {
       types: `./${config.distEntryFileName}.d.ts`,
-      default: `./${config.distEntryFileName}.js`
-    }
+      default: `./${config.distEntryFileName}.js`,
+    },
   };
   distPackage.sideEffects = false;
 
@@ -143,7 +143,7 @@ const build = async () => {
       } catch {
         // ignore if file doesn't exist
       }
-    })
+    }),
   );
 
   const stats = await getBuildStats();

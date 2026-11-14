@@ -10,7 +10,7 @@ interface CounterState {
 
 const counter = defineStore<CounterState>('counter')((set) => ({
   increment: () => set((state) => ({ count: state.count + 1, label: state.label })),
-  setLabel: (label: string) => set((state) => ({ count: state.count, label }))
+  setLabel: (label: string) => set((state) => ({ count: state.count, label })),
 }));
 
 const initialState: CounterState = { count: 0, label: 'a' };
@@ -40,7 +40,7 @@ describe('defineStore', () => {
 
         return { count, actions };
       },
-      { wrapper }
+      { wrapper },
     );
 
     expect(result.current.count).toBe(0);
@@ -64,7 +64,7 @@ describe('defineStore', () => {
 
         return { count, actions };
       },
-      { wrapper }
+      { wrapper },
     );
 
     const rendersBefore = renderCount.mock.calls.length;
@@ -94,13 +94,13 @@ describe('defineStore', () => {
 
   it('throws when useStore is used outside of its provider', () => {
     expect(() => renderHook(() => counter.useStore())).toThrow(
-      /useStore must be used within <counter\.Provider>/
+      /useStore must be used within <counter\.Provider>/,
     );
   });
 
   it('throws when useActions is used outside of its provider', () => {
     expect(() => renderHook(() => counter.useActions())).toThrow(
-      /useActions must be used within <counter\.Provider>/
+      /useActions must be used within <counter\.Provider>/,
     );
   });
 
@@ -116,17 +116,17 @@ describe('defineStore', () => {
     const { result: firstResult } = renderHook(
       () => ({
         count: counter.useStore((state) => state.count),
-        actions: counter.useActions()
+        actions: counter.useActions(),
       }),
-      { wrapper: first }
+      { wrapper: first },
     );
 
     const { result: secondResult } = renderHook(
       () => ({
         count: counter.useStore((state) => state.count),
-        actions: counter.useActions()
+        actions: counter.useActions(),
       }),
-      { wrapper: second }
+      { wrapper: second },
     );
 
     expect(firstResult.current.count).toBe(100);

@@ -18,16 +18,16 @@ export function provider<P extends AnyComponent>(Provider: P): ProviderDefinitio
 
 export function provider<P extends AnyComponent>(
   Provider: P,
-  props: Omit<React.ComponentProps<P>, 'children'>
+  props: Omit<React.ComponentProps<P>, 'children'>,
 ): ProviderDefinition<P>;
 
 export function provider<P extends AnyComponent>(
   Provider: P,
-  props?: Omit<React.ComponentProps<P>, 'children'>
+  props?: Omit<React.ComponentProps<P>, 'children'>,
 ): ProviderDefinition<P> {
   return {
     Provider,
-    props: (props ?? {}) as Omit<React.ComponentProps<P>, 'children'>
+    props: (props ?? {}) as Omit<React.ComponentProps<P>, 'children'>,
   };
 }
 
@@ -43,7 +43,7 @@ export function compose(...providers: Readonly<Array<ProviderDefinition<AnyCompo
         (children, provider) => {
           return React.createElement(provider.Provider, provider.props, children);
         },
-        React.createElement(Component, props)
+        React.createElement(Component, props),
       );
     }
 

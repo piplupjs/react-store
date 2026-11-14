@@ -20,7 +20,7 @@ describe('compose', () => {
   it('wraps the component with providers, innermost-last', () => {
     const Composed = compose(
       provider(Layer, { color: 'outer' }),
-      provider(Layer, { color: 'inner' })
+      provider(Layer, { color: 'inner' }),
     )(Main);
 
     const { container } = render(<Composed />);

@@ -108,7 +108,7 @@ function createStore<TState extends object>(initialState: Readonly<TState>): Sto
   return {
     getState,
     setState,
-    subscribe
+    subscribe,
   };
 }
 
@@ -125,7 +125,7 @@ function createStore<TState extends object>(initialState: Readonly<TState>): Sto
  */
 function createSelectorSubscription<TState extends object, TResult>(
   store: Store<TState>,
-  selector: Selector<TState, TResult>
+  selector: Selector<TState, TResult>,
 ): SelectorSubscription<TResult> {
   let state = store.getState();
   let selected = selector(state);
@@ -182,7 +182,7 @@ function createSelectorSubscription<TState extends object, TResult>(
   return {
     getSnapshot,
     getServerSnapshot,
-    subscribe
+    subscribe,
   };
 }
 
@@ -196,7 +196,7 @@ function defaultSelector<TState extends object>(state: Readonly<TState>): Readon
 
 export function defineStore<TState extends object>(name: string) {
   return function defineStoreWithActions<TActions extends object>(
-    createActions: (set: SetStore<TState>) => TActions
+    createActions: (set: SetStore<TState>) => TActions,
   ) {
     const StoreContext = createContext<Store<TState> | null>(null);
 
@@ -263,13 +263,13 @@ export function defineStore<TState extends object>(name: string) {
         selector ?? defaultSelector;
       const subscription = useMemo(
         () => createSelectorSubscription(store, resolvedSelector),
-        [store, resolvedSelector]
+        [store, resolvedSelector],
       );
 
       return useSyncExternalStore(
         subscription.subscribe,
         subscription.getSnapshot,
-        subscription.getServerSnapshot
+        subscription.getServerSnapshot,
       );
     }
 
@@ -292,7 +292,7 @@ export function defineStore<TState extends object>(name: string) {
     return {
       Provider,
       useActions,
-      useStore
+      useStore,
     };
   };
 }
