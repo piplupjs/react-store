@@ -1,9 +1,0 @@
-{
-  "$schema": "./node_modules/oxfmt/configuration_schema.json",
-  "ignorePatterns": ["node_modules", ".git", ".cache", "dist"],
-  "semi": true,
-  "singleQuote": true,
-  "tabWidth": 2,
-  "useTabs": false,
-  "trailingComma": "none"
-}

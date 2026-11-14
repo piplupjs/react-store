@@ -5,6 +5,9 @@ allowBuilds:
   esbuild: true
   lefthook: true
 
+minimumReleaseAgeExclude:
+  - '@piplup/code-infra@2.0.2'
+
 onlyBuiltDependencies:
   - esbuild
   - lefthook

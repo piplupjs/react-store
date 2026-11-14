@@ -60,7 +60,7 @@ const workspaceRoot = getWorkspaceRoot();
 export const spawn = (
   cmd,
   args,
-  { cwd = workspaceRoot, encoding = 'utf8', stdio = 'pipe' } = {}
+  { cwd = workspaceRoot, encoding = 'utf8', stdio = 'pipe' } = {},
 ) => {
   const useShell = isWindows && WINDOWS_CMD_SHIMS.has(cmd);
   const command = toExecutable(cmd);
@@ -72,8 +72,8 @@ export const spawn = (
       cwd,
       encoding,
       stdio,
-      windowsVerbatimArguments: useShell
-    }
+      windowsVerbatimArguments: useShell,
+    },
   );
 };
 
@@ -97,7 +97,7 @@ export const exec = (cmd, args, { cwd = workspaceRoot, silent = false } = {}) =>
   const result = spawn(cmd, args, {
     cwd,
     encoding: 'utf8',
-    stdio: silent ? 'pipe' : 'inherit'
+    stdio: silent ? 'pipe' : 'inherit',
   });
 
   if (result.status !== 0) {

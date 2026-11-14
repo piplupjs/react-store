@@ -1,9 +1,12 @@
+// eslint-disable testing-library/no-container -- these tests check how the providers nest in the DOM
+import * as React from 'react';
+
 import { render } from '@testing-library/react';
-import type { ReactNode } from 'react';
 import { describe, expect, it } from 'vitest';
+
 import { compose, provider } from '../src/index.js';
 
-function Layer({ color, children }: { color?: string; children?: ReactNode }) {
+function Layer({ children, color }: { children?: React.ReactNode; color?: string }) {
   return (
     <section data-color={color}>
       <span>{color ?? 'none'}</span>
@@ -20,7 +23,7 @@ describe('compose', () => {
   it('wraps the component with providers, innermost-last', () => {
     const Composed = compose(
       provider(Layer, { color: 'outer' }),
-      provider(Layer, { color: 'inner' })
+      provider(Layer, { color: 'inner' }),
     )(Main);
 
     const { container } = render(<Composed />);

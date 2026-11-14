@@ -1,6 +1,8 @@
+import * as React from 'react';
+
 import { act, renderHook } from '@testing-library/react';
-import type { ReactElement, ReactNode } from 'react';
 import { describe, expect, it, vi } from 'vitest';
+
 import { defineStore } from '../src/index.js';
 
 interface CounterState {
@@ -10,12 +12,12 @@ interface CounterState {
 
 const counter = defineStore<CounterState>('counter')((set) => ({
   increment: () => set((state) => ({ count: state.count + 1, label: state.label })),
-  setLabel: (label: string) => set((state) => ({ count: state.count, label }))
+  setLabel: (label: string) => set((state) => ({ count: state.count, label })),
 }));
 
 const initialState: CounterState = { count: 0, label: 'a' };
 
-const wrapper: (props: { children: ReactNode }) => ReactElement = ({ children }) => (
+const wrapper: (props: { children: React.ReactNode }) => React.ReactElement = ({ children }) => (
   <counter.Provider initialState={initialState}>{children}</counter.Provider>
 );
 
@@ -38,9 +40,9 @@ describe('defineStore', () => {
         const count = counter.useStore((state) => state.count);
         const actions = counter.useActions();
 
-        return { count, actions };
+        return { actions, count };
       },
-      { wrapper }
+      { wrapper },
     );
 
     expect(result.current.count).toBe(0);
@@ -62,9 +64,9 @@ describe('defineStore', () => {
 
         renderCount();
 
-        return { count, actions };
+        return { actions, count };
       },
-      { wrapper }
+      { wrapper },
     );
 
     const rendersBefore = renderCount.mock.calls.length;
@@ -77,7 +79,7 @@ describe('defineStore', () => {
   });
 
   it('returns referentially stable actions across re-renders', () => {
-    const { result, rerender } = renderHook(() => counter.useActions(), { wrapper });
+    const { rerender, result } = renderHook(() => counter.useActions(), { wrapper });
 
     const first = result.current;
 
@@ -94,39 +96,39 @@ describe('defineStore', () => {
 
   it('throws when useStore is used outside of its provider', () => {
     expect(() => renderHook(() => counter.useStore())).toThrow(
-      /useStore must be used within <counter\.Provider>/
+      /useStore must be used within <counter\.Provider>/,
     );
   });
 
   it('throws when useActions is used outside of its provider', () => {
     expect(() => renderHook(() => counter.useActions())).toThrow(
-      /useActions must be used within <counter\.Provider>/
+      /useActions must be used within <counter\.Provider>/,
     );
   });
 
   it('isolates state between provider instances', () => {
-    const first: (props: { children: ReactNode }) => ReactElement = ({ children }) => (
+    const first: (props: { children: React.ReactNode }) => React.ReactElement = ({ children }) => (
       <counter.Provider initialState={{ count: 100, label: 'first' }}>{children}</counter.Provider>
     );
 
-    const second: (props: { children: ReactNode }) => ReactElement = ({ children }) => (
+    const second: (props: { children: React.ReactNode }) => React.ReactElement = ({ children }) => (
       <counter.Provider initialState={{ count: 200, label: 'second' }}>{children}</counter.Provider>
     );
 
     const { result: firstResult } = renderHook(
       () => ({
+        actions: counter.useActions(),
         count: counter.useStore((state) => state.count),
-        actions: counter.useActions()
       }),
-      { wrapper: first }
+      { wrapper: first },
     );
 
     const { result: secondResult } = renderHook(
       () => ({
+        actions: counter.useActions(),
         count: counter.useStore((state) => state.count),
-        actions: counter.useActions()
       }),
-      { wrapper: second }
+      { wrapper: second },
     );
 
     expect(firstResult.current.count).toBe(100);

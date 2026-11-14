@@ -5,9 +5,9 @@
 import { promises as fs } from 'node:fs';
 import { join, relative } from 'node:path';
 
+import Table from 'cli-table3';
 import esbuild from 'esbuild';
 import fg from 'fast-glob';
-import Table from 'cli-table3';
 import { filesize } from 'filesize';
 import { gzipSize } from 'gzip-size';
 
@@ -16,30 +16,30 @@ import { getWorkspaceRoot, exec } from './utils.mjs';
 const workspaceRoot = getWorkspaceRoot();
 
 const config = {
-  workspaceRoot,
   get distDirectory() {
     return join(this.workspaceRoot, 'dist');
+  },
+  distEntryFileName: 'index',
+  get distPackageJson() {
+    return join(this.distDirectory, 'package.json');
   },
   get workspacePackageJson() {
     return join(this.workspaceRoot, 'package.json');
   },
-  get distPackageJson() {
-    return join(this.distDirectory, 'package.json');
-  },
-  distEntryFileName: 'index'
+  workspaceRoot,
 };
 
 const runCleanup = async () => {
   return exec('pnpm', ['cleanup'], {
-    cwd: config.workspaceRoot
+    cwd: config.workspaceRoot,
   });
 };
 
 const getBuildStats = async () => {
   const files = await fg(['**/*.js', '**/*.d.ts', '**/*.json', 'LICENSE', 'README.md'], {
-    cwd: config.distDirectory,
     absolute: true,
-    onlyFiles: true
+    cwd: config.distDirectory,
+    onlyFiles: true,
   });
 
   let total = 0;
@@ -57,22 +57,22 @@ const getBuildStats = async () => {
 
       return {
         file: relative(config.distDirectory, file),
+        gzip: filesize(gzip),
         size: filesize(size),
-        gzip: filesize(gzip)
       };
-    })
+    }),
   );
 
   return {
     files: stats.sort((a, b) => a.file.localeCompare(b.file)),
+    gzipTotal,
     total,
-    gzipTotal
   };
 };
 
 const createStatsTable = (stats) => {
   const table = new Table({
-    head: ['File', 'Size', 'Gzip']
+    head: ['File', 'Size', 'Gzip'],
   });
 
   for (const item of stats.files) {
@@ -86,27 +86,27 @@ const build = async () => {
   await runCleanup();
 
   const entryPoints = await fg(['src/**/*.{ts,tsx}'], {
+    absolute: true,
     cwd: config.workspaceRoot,
     ignore: ['**/*.test.ts', '**/*.test.tsx'],
-    absolute: true
   });
 
   await esbuild.build({
-    entryPoints,
-    platform: 'browser',
-    format: 'esm',
-    outdir: config.distDirectory,
-    outbase: 'src',
-    target: 'es2020',
-    packages: 'external',
     define: {
-      'process.env.NODE_ENV': '"production"'
+      'process.env.NODE_ENV': '"production"',
     },
-    minifySyntax: true
+    entryPoints,
+    format: 'esm',
+    minifySyntax: true,
+    outbase: 'src',
+    outdir: config.distDirectory,
+    packages: 'external',
+    platform: 'browser',
+    target: 'es2020',
   });
 
   exec('tsc', ['-p', 'tsconfig.build.json'], {
-    cwd: config.workspaceRoot
+    cwd: config.workspaceRoot,
   });
 
   const workspacePackageJson = JSON.parse(await fs.readFile(config.workspacePackageJson, 'utf8'));
@@ -117,9 +117,9 @@ const build = async () => {
   distPackage.types = `./${config.distEntryFileName}.d.ts`;
   distPackage.exports = {
     '.': {
+      default: `./${config.distEntryFileName}.js`,
       types: `./${config.distEntryFileName}.d.ts`,
-      default: `./${config.distEntryFileName}.js`
-    }
+    },
   };
   distPackage.sideEffects = false;
 
@@ -143,7 +143,7 @@ const build = async () => {
       } catch {
         // ignore if file doesn't exist
       }
-    })
+    }),
   );
 
   const stats = await getBuildStats();

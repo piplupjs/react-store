@@ -1,49 +1,51 @@
 import * as React from 'react';
 
-//#region Types
+// #region Types
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type AnyComponent = React.ComponentType<any>;
 
 type ProviderDefinition<P extends AnyComponent> = Readonly<{
-  Provider: P;
   props: Omit<React.ComponentProps<P>, 'children'>;
+  Provider: P;
 }>;
 
-//#endregion
+// #endregion
 
-//#region Provider
+// #region Provider
 
 export function provider<P extends AnyComponent>(Provider: P): ProviderDefinition<P>;
 
 export function provider<P extends AnyComponent>(
   Provider: P,
-  props: Omit<React.ComponentProps<P>, 'children'>
+  props: Omit<React.ComponentProps<P>, 'children'>,
 ): ProviderDefinition<P>;
 
 export function provider<P extends AnyComponent>(
   Provider: P,
-  props?: Omit<React.ComponentProps<P>, 'children'>
+  props?: Omit<React.ComponentProps<P>, 'children'>,
 ): ProviderDefinition<P> {
   return {
+    props: (props ?? {}) as Omit<React.ComponentProps<P>, 'children'>,
     Provider,
-    props: (props ?? {}) as Omit<React.ComponentProps<P>, 'children'>
   };
 }
 
-//#endregion
+// #endregion
 
-//#region Compose
+// #region Compose
 
 export function compose(...providers: Readonly<Array<ProviderDefinition<AnyComponent>>>) {
-  return function <P extends object>(Component: React.ComponentType<P>): React.ComponentType<P> {
+  return function withProviders<P extends object>(
+    Component: React.ComponentType<P>,
+  ): React.ComponentType<P> {
     function Compose(props: P) {
       // oxlint-disable-next-line no-shadow
       return providers.reduceRight<React.ReactNode>(
         (children, provider) => {
           return React.createElement(provider.Provider, provider.props, children);
         },
-        React.createElement(Component, props)
+        React.createElement(Component, props),
       );
     }
 
@@ -55,4 +57,4 @@ export function compose(...providers: Readonly<Array<ProviderDefinition<AnyCompo
   };
 }
 
-//#endregion
+// #endregion
